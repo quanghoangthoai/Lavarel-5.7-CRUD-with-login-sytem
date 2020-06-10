@@ -6,6 +6,9 @@ use Auth;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Carbon\Carbon;
+use App\User;
+use Illuminate\Support\Facades\Hash;
 
 class LoginController extends Controller
 {
@@ -20,21 +23,32 @@ class LoginController extends Controller
     |
     */
 
-    use AuthenticatesUsers;
+   use AuthenticatesUsers;
 
     /**
-     * Where to redirect users after login.
+     * The user has been authenticated.
      *
-     * @var string
+     * @param  \Illuminate\Http\Request  $request
+     * @param  mixed  $user
+     * @return mixed
      */
-    public function authenticated()
+    public function authenticated(Request $request, $user)
 {
-    if(auth())
-    {
-        return redirect('/products');
-    } 
+
+    $user->timestamps = false;
+    $user->last_login_at = Carbon::now('Asia/Ho_Chi_Minh')->toDateTimeString();
+    $user->last_login_ip = $request->ip();
+    $user->save();
+  if(auth())
+{
 
     return redirect('/products');
+
+ }
+
+    return redirect('/products');
+
+
 }
 
     public function logout(Request $request) {
